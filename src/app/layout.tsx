@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ai tool hub",
-  description: "A tool of the future",
+  title: {
+    default: "AI Tool Hub",
+    template: "%s | AI Tool Hub",
+  },
+  description: "Catalog of vetted AI tools",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
