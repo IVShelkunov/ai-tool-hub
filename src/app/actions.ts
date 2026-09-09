@@ -1,8 +1,8 @@
 "use server"
 
 import { and, eq } from "drizzle-orm"
-import { db } from "."
-import { favorites } from "./schema"
+import { db } from "../db"
+import { favorites } from "../db/schema"
 import { revalidatePath } from "next/cache";
 
 export async function toggleFavorite(toolId: string) {
