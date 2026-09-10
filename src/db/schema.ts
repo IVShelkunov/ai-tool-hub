@@ -21,6 +21,12 @@ export const favorites = pgTable('favorites', {
 }, (table) => ({
     uniqueIdx: uniqueIndex("unique_favorite").on(table.toolId, table.userId)
 }));
+export const sessions = pgTable('sessions', {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionToken: text("session_token").notNull().unique(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'date' }).notNull()
+});
 
 export const userRelation = relations(users, ({ many }) => ({
     favorites: many(favorites)
@@ -29,3 +35,7 @@ export const favoritesRelation = relations(favorites, ({ one }) => ({
     user: one(users, { fields: [favorites.userId], references: [users.id] }),
     tool: one(aiTools, { fields: [favorites.toolId], references: [aiTools.id] })
 }));
+export const sessionRelation = relations(sessions, ({ one }) => ({
+    user: one(users, { fields: [sessions.userId], references: [users.id] })
+}));
+
