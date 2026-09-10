@@ -10,10 +10,7 @@ import { aiTools } from "@/db/schema";
 export default async function Home() {
   const tools = await db.select().from(aiTools);
   return (
-    <main className="p-10">
-      <h1 className="md:text-5xl text-3xl font-bold mb-6 text-transparent tracking-widest [-webkit-text-stroke:1px_var(--color-sky-500)] ">
-        AI TOOL HUB
-      </h1>
+    <div className="p-10">
       <div className="grid gap-4">
         {tools.map((tool) => (
           <Card
@@ -27,6 +24,6 @@ export default async function Home() {
           </Card>
         ))}
       </div>
-    </main>
+    </div>
   );
 }
