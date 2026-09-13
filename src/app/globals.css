@@ -127,5 +127,13 @@
   html {
     @apply font-sans;
     }
+    input {
+      background-color: var(--color-sky-400);
+      border-radius: 10px;
+      padding:8px
+    }
+    button {
+      cursor: pointer;
+    }
 
 }
