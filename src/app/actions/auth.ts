@@ -5,14 +5,15 @@ import { sessions, users } from "@/db/schema";
 import { verifyPassword } from "@/lib/auth-utils";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const loginAction = async (prevState: any, formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const [user] = await db.select().from(users).where(eq(users.email, email));
-    if (!user) return { error: "Неверный email или пароль" };
+    if (!user) return { message: "Неверный email или пароль", success: false };
     const isValid = await verifyPassword(password, user.password);
-    if (!isValid) return { error: "Неверный email или пароль" };
+    if (!isValid) return { message: "Неверный email или пароль", success: false };
     const session_token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await db.insert(sessions).values({
@@ -26,6 +27,15 @@ export const loginAction = async (prevState: any, formData: FormData) => {
         expires: expiresAt,
         sameSite: "lax"
     });
-    return { success: true };
-
+    redirect('/dashboard');
+    return { message: 'Авторизация прошла успешно!', success: true };
+}
+export const logoutAction = async () => {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get('session_token')?.value;
+    if (token) {
+        await db.delete(sessions).where(eq(sessions.sessionToken, token));
+        cookiesStore.delete("session_token");
+    }
+    redirect('/login');
 }

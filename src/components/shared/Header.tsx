@@ -1,4 +1,7 @@
 import { cookies } from "next/headers";
+import { LoginButton } from "../ui/LoginButton";
+import Link from "next/link";
+import { LogoutButton } from "../ui/LogoutButton";
 
 export async function Header() {
   const coockieStore = await cookies();
@@ -6,9 +9,10 @@ export async function Header() {
   return (
     <header className="flex items-center justify-between p-6 bg-linear-to-r from-slate-950 via-slate-500 to-slate-900">
       <h1 className="md:text-5xl text-3xl font-bold text-transparent tracking-widest [-webkit-text-stroke:1px_var(--color-sky-500)] ">
-        AI TOOL HUB
+        <Link href={"/"}>AI TOOL HUB</Link>
       </h1>
-      {token ? <button>Logout</button> : <button>Login</button>}
+      {token && <Link href={"/dashboard"}>DASHBOARD</Link>}
+      {token ? <LogoutButton /> : <LoginButton />}
     </header>
   );
 }
