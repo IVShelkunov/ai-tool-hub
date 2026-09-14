@@ -1,7 +1,7 @@
 "use client";
 import { toggleFavorite } from "@/app/actions/tools";
 import { useOptimistic, useTransition } from "react";
-import { FavoriteIcon } from "./FavoriteIcon";
+import { FavoriteIcon } from "../icon/FavoriteIcon";
 
 interface FavoriteButtonProps {
   userId: string;
