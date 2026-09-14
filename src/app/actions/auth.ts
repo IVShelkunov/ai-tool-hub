@@ -28,7 +28,6 @@ export const loginAction = async (prevState: any, formData: FormData) => {
         sameSite: "lax"
     });
     redirect('/dashboard');
-    return { message: 'Авторизация прошла успешно!', success: true };
 }
 export const logoutAction = async () => {
     const cookiesStore = await cookies();
