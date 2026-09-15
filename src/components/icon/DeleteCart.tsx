@@ -12,20 +12,20 @@ export default function DeleteCart({ className }: { className?: string }) {
           y1={0}
           x2={0}
           y2={20}
-          stroke="#fff"
+          stroke="#1dc2c4"
           strokeWidth={3}
           strokeLinecap="round"
         />
       </defs>
       <path
         d="M 5,10 l 40,0 a 5,5 0 0 0 -5,-5 l -10,0 l 0,-2.5 l -10,0 l 0,2.5 l -10,0 a 5,5 0 0 0 -5,5"
-        stroke="#fff"
+        stroke="#1dc2c4"
         fill="none"
       />
       <path
         d="M 10,15 l 0,25 a 5,5 0 0 0 5,5 l 20,0 a 5,5 0 0 0 5,-5 l 0,-25 Z"
         fill="none"
-        stroke="#fff"
+        stroke="#1dc2c4"
       />
       <use href="#vertical-line" x={15} y={20} />
       <use href="#vertical-line" x={25} y={20} />
