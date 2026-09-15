@@ -7,12 +7,30 @@ export async function Header() {
   const coockieStore = await cookies();
   const token = coockieStore.get("session_token");
   return (
-    <header className="flex items-center justify-between p-6 bg-linear-to-r from-slate-950 via-slate-500 to-slate-900">
-      <h1 className="md:text-5xl text-3xl font-bold text-transparent tracking-widest [-webkit-text-stroke:1px_var(--color-sky-500)] ">
-        <Link href={"/"}>AI TOOL HUB</Link>
-      </h1>
-      {token && <Link href={"/dashboard"}>DASHBOARD</Link>}
-      {token ? <LogoutButton /> : <LoginButton />}
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
+      <nav
+        className="container mx-auto flex h-16 items-center justify-between px-4 md:px-10"
+        aria-label="Global"
+      >
+        <div className="flex md:flex-row flex-col gap-2 items-center md:gap-8">
+          <Link href={"/"}>
+            <span className="md:text-5xl text-3xl font-bold  text-transparent bg-clip-text bg-linear-to-r from-sky-300 via-indigo-500 to-sky-400 shine-base hover-shine ">
+              AI TOOL HUB
+            </span>
+          </Link>
+          {token && (
+            <Link
+              href={"/dashboard"}
+              className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+            >
+              DASHBOARD
+            </Link>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          {token ? <LogoutButton /> : <LoginButton />}
+        </div>
+      </nav>
     </header>
   );
 }

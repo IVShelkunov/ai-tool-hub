@@ -127,13 +127,23 @@
   html {
     @apply font-sans;
     }
-    input {
-      background-color: var(--color-sky-400);
-      border-radius: 10px;
-      padding:8px
-    }
+
     button {
       cursor: pointer;
     }
 
+}
+@layer utilities {
+  .shine-base {
+    background-size: 200% auto;
+  }
+  
+  .hover-shine:hover {
+    animation: rainbow-shine 1.0s linear forwards;
+  }
+}
+
+@keyframes rainbow-shine {
+ from { background-position: 0% center; }
+    to { background-position: 200% center; }
 }
