@@ -1,6 +1,6 @@
-import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
+import { ProxyConfig, NextRequest, NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const token = request.cookies.get("session_token");
     const { pathname } = request.nextUrl;
     if (pathname.startsWith('/dashboard') && !token) {
@@ -11,6 +11,6 @@ export function middleware(request: NextRequest) {
     }
     return NextResponse.next();
 }
-export const config: MiddlewareConfig = {
+export const config: ProxyConfig = {
     matcher: ['/dashboard/:path*', '/login']
 }
