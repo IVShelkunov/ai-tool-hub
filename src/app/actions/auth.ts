@@ -1,11 +1,13 @@
 "use server"
 
 import { db } from "@/db";
-import { sessions, users } from "@/db/schema";
-import { verifyPassword } from "@/lib/auth-utils";
+import { sessions, users, verificationTokens } from "@/db/schema";
+import { hashPassword, verifyPassword } from "@/lib/auth-utils";
+import { error } from "console";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import z from "zod";
 
 export const loginAction = async (prevState: any, formData: FormData) => {
     const email = formData.get("email") as string;
@@ -37,4 +39,33 @@ export const logoutAction = async () => {
         cookiesStore.delete("session_token");
     }
     redirect('/login');
+}
+const registerSchema = z.object({
+    email: z.email({ error: "Неверный формат почты" }),
+    password: z.string().min(6, "Пароль должен быть от 6 символов")
+});
+export const registerAction = async (prevState: any, formData: FormData) => {
+    const rawData = Object.entries(formData.entries());
+    const validatedFields = registerSchema.safeParse(rawData);
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors }
+    }
+    const { email, password } = validatedFields.data;
+    const hashedPassword = await hashPassword(password);
+    try {
+        await db.transaction(async (tx) => {
+            const [newUser] = await tx.insert(users).values({
+                email, password: hashedPassword
+            }).returning();
+            await tx.insert(verificationTokens).values({
+                token: crypto.randomUUID(),
+                userId: newUser.id,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            });
+        });
+    } catch (err) {
+        return { error: "Ошибка регистрации" };
+    }
+
+    redirect('/verify-email');
 }
