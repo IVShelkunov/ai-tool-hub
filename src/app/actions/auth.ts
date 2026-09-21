@@ -3,10 +3,10 @@
 import { db } from "@/db";
 import { sessions, users, verificationTokens } from "@/db/schema";
 import { hashPassword, verifyPassword } from "@/lib/auth-utils";
-import { error } from "console";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Resend } from "resend";
 import z from "zod";
 
 export const loginAction = async (prevState: any, formData: FormData) => {
@@ -52,17 +52,27 @@ export const registerAction = async (prevState: any, formData: FormData) => {
     }
     const { email, password } = validatedFields.data;
     const hashedPassword = await hashPassword(password);
+    const token = crypto.randomUUID();
     try {
         await db.transaction(async (tx) => {
             const [newUser] = await tx.insert(users).values({
                 email, password: hashedPassword
             }).returning();
-            await tx.insert(verificationTokens).values({
-                token: crypto.randomUUID(),
+            const [userVerify] = await tx.insert(verificationTokens).values({
+                token: token,
                 userId: newUser.id,
                 expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-            });
+            }).returning();
         });
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+            from: 'onboarding@resend.dev',
+            to: email,
+            subject: 'Подтверждение регистрации',
+            html: `<p>Перейди по ссылке для подтверждения:
+         <a href="${process.env.APP_URL}/verify-email/${token}">Подтвердить</a></p>`
+        });
+
     } catch (err) {
         return { error: "Ошибка регистрации" };
     }
