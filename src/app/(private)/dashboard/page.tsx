@@ -1,17 +1,10 @@
 import { ToolCard } from "@/components/shared/ToolCard";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { DeleteToolsButton } from "@/components/ui/DeleteToolsButton";
 import { db } from "@/db";
-import { aiTools, favorites, sessions } from "@/db/schema";
+import { favorites } from "@/db/schema";
 import { getSession } from "@/lib/auth-utils";
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 
 export default async function DashboardPage() {
   const currentUserId = await getSession();

@@ -10,14 +10,14 @@ export const users = pgTable('users', {
 export const verificationTokens = pgTable("verification_tokens", {
     id: uuid("id").defaultRandom().primaryKey(),
     token: text("token").notNull().unique(),
-    userId: uuid("user_id").references(() => users.id).notNull(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'date' }).notNull()
 });
 
 export const sessions = pgTable('sessions', {
     id: uuid("id").defaultRandom().primaryKey(),
     sessionToken: text("session_token").notNull().unique(),
-    userId: uuid("user_id").references(() => users.id).notNull(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'date' }).notNull()
 });
 
@@ -34,7 +34,7 @@ export const aiTools = pgTable('ai_tools', {
 export const favorites = pgTable('favorites', {
     id: uuid("id").defaultRandom().primaryKey(),
     toolId: uuid("tool_id").references(() => aiTools.id).notNull(),
-    userId: uuid("user_id").references(() => users.id).notNull()
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull()
 }, (table) => ({
     uniqueIdx: uniqueIndex("unique_favorite").on(table.toolId, table.userId)
 }));
