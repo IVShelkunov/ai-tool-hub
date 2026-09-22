@@ -42,28 +42,41 @@ export const logoutAction = async () => {
 }
 const registerSchema = z.object({
     email: z.email({ error: "Неверный формат почты" }),
-    password: z.string().min(6, "Пароль должен быть от 6 символов")
+    password: z.string().min(6, "Пароль должен быть от 6 символов"),
+    confirmPassword: z.string().min(6, "Пароль должен быть от 6 символов")
+}).refine(data => data.confirmPassword === data.password, {
+    message: "Пароли не совпадают",
+    path: ['confirmPassword']
 });
-export const registerAction = async (prevState: any, formData: FormData) => {
-    const rawData = Object.entries(formData.entries());
+export type FormState = {
+    error?: {
+        email?: string[];
+        password?: string[];
+        confirmPassword?: string[];
+    };
+    message?: string;
+    success?: boolean;
+};
+export const registerAction = async (prevState: FormState, formData: FormData): Promise<FormState> => {
+    const rawData = Object.fromEntries(formData.entries());
     const validatedFields = registerSchema.safeParse(rawData);
+
     if (!validatedFields.success) {
-        return { error: validatedFields.error.flatten().fieldErrors }
+        return { error: validatedFields.error.flatten().fieldErrors, success: false }
     }
-    const { email, password } = validatedFields.data;
+    const { email, password, confirmPassword } = validatedFields.data;
     const hashedPassword = await hashPassword(password);
     const token = crypto.randomUUID();
     try {
-        await db.transaction(async (tx) => {
-            const [newUser] = await tx.insert(users).values({
-                email, password: hashedPassword
-            }).returning();
-            const [userVerify] = await tx.insert(verificationTokens).values({
-                token: token,
-                userId: newUser.id,
-                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-            }).returning();
+        const [newUser] = await db.insert(users).values({
+            email, password: hashedPassword
+        }).returning();
+        await db.insert(verificationTokens).values({
+            token: token,
+            userId: newUser.id,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
         });
+
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
             from: 'onboarding@resend.dev',
@@ -74,8 +87,29 @@ export const registerAction = async (prevState: any, formData: FormData) => {
         });
 
     } catch (err) {
-        return { error: "Ошибка регистрации" };
+        if (err instanceof Error) {
+            console.error(err)
+        }
+        return { success: false, message: "Ошибка регистрации" };
     }
 
+    redirect('/verify-email');
+}
+export const resendVerificationAction = async (userId: string, email: string) => {
+    await db.delete(verificationTokens).where(eq(verificationTokens.userId, userId));
+    const newToken = crypto.randomUUID();
+    await db.insert(verificationTokens).values({
+        token: newToken,
+        userId: userId,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: email,
+        subject: 'Подтверждение регистрации',
+        html: `<p>Перейди по ссылке для подтверждения:
+         <a href="${process.env.APP_URL}/verify-email/${newToken}">Подтвердить</a></p>`
+    });
     redirect('/verify-email');
 }
