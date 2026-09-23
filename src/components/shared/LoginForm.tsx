@@ -8,6 +8,12 @@ import { OpenEye } from "../icon/OpenEye";
 import { CloseEye } from "../icon/CloseEye";
 
 export function LoginForm() {
+  const [inputData, setInputData] = useState<{
+    email: string;
+    password: string;
+  }>({ email: "", password: "" });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setInputData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const initialState = { message: "", success: false };
   const [state, formAction] = useActionState(loginAction, initialState);
   const [showPass, setShowPass] = useState(false);
@@ -32,6 +38,8 @@ export function LoginForm() {
           name="email"
           id="email"
           type="email"
+          value={inputData.email}
+          onChange={handleInputChange}
           required
         />
       </FormGroup>
@@ -45,6 +53,8 @@ export function LoginForm() {
           id="password"
           type={showPass ? "text" : "password"}
           required
+          value={inputData.password}
+          onChange={handleInputChange}
         />
       </FormGroup>
       <FormGroup className="flex-row">
