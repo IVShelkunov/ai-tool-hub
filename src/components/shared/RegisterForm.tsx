@@ -1,6 +1,5 @@
 "use client";
 import { useActionState, useState } from "react";
-import { Card } from "../ui/card";
 import { FormGroup } from "../ui/FormGroup";
 import { OpenEye } from "../icon/OpenEye";
 import { CloseEye } from "../icon/CloseEye";
@@ -8,6 +7,13 @@ import { cn } from "cn";
 import { FormState, registerAction } from "@/app/actions/auth";
 
 export function RegisterForm() {
+  const [inputData, setInputData] = useState<{
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({ email: "", password: "", confirmPassword: "" });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setInputData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const initialState: FormState = { error: undefined, success: false };
   const [showPass, setShowPass] = useState(false);
   const [state, formAction, isPending] = useActionState(
@@ -36,6 +42,8 @@ export function RegisterForm() {
           id="email"
           type="email"
           required
+          value={inputData.email}
+          onChange={handleInputChange}
         />
         {state.error && <p className="text-red-500">{state.error.email}</p>}
       </FormGroup>
@@ -49,6 +57,8 @@ export function RegisterForm() {
           id="password"
           type={showPass ? "text" : "password"}
           required
+          value={inputData.password}
+          onChange={handleInputChange}
         />
         {state.error && <p className="text-red-500">{state.error.password}</p>}
       </FormGroup>
@@ -63,6 +73,8 @@ export function RegisterForm() {
           id="confirm-password"
           type={showPass ? "text" : "password"}
           required
+          value={inputData.confirmPassword}
+          onChange={handleInputChange}
         />
         {state.error && (
           <p className="text-red-500">{state.error.confirmPassword}</p>

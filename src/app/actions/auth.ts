@@ -64,7 +64,11 @@ export const registerAction = async (prevState: FormState, formData: FormData): 
     if (!validatedFields.success) {
         return { error: validatedFields.error.flatten().fieldErrors, success: false }
     }
-    const { email, password, confirmPassword } = validatedFields.data;
+    const { email, password } = validatedFields.data;
+    const [existingUser] = await db.select().from(users).where(eq(users.email, email));
+    if (existingUser) {
+        return { error: { email: ["Пользователь с таким email уже существует"] }, success: false }
+    }
     const hashedPassword = await hashPassword(password);
     const token = crypto.randomUUID();
     try {
