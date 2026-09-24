@@ -5,7 +5,8 @@ export const users = pgTable('users', {
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull().unique(),
     password: text("password").notNull(),
-    isVerified: boolean("is_verified").default(false).notNull()
+    isVerified: boolean("is_verified").default(false).notNull(),
+    avatarUrl: text("avatar_url")
 });
 export const verificationTokens = pgTable("verification_tokens", {
     id: uuid("id").defaultRandom().primaryKey(),
