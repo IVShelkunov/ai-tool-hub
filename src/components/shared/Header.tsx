@@ -19,12 +19,20 @@ export async function Header() {
             </span>
           </Link>
           {token && (
-            <Link
-              href={"/dashboard"}
-              className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-            >
-              DASHBOARD
-            </Link>
+            <>
+              <Link
+                href={"/dashboard"}
+                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+              >
+                DASHBOARD
+              </Link>
+              <Link
+                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                href={"/profile"}
+              >
+                PROFILE
+              </Link>
+            </>
           )}
         </div>
         <div className="flex items-center gap-4">

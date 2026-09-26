@@ -3,6 +3,7 @@ import { boolean, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-or
 //users
 export const users = pgTable('users', {
     id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name"),
     email: text("email").notNull().unique(),
     password: text("password").notNull(),
     isVerified: boolean("is_verified").default(false).notNull(),
