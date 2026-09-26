@@ -7,12 +7,13 @@ export function AvatarUploader({ userId }: { userId: string }) {
   return (
     <UploadButton<OurFileRouter, "imageUploader">
       appearance={{
-        button: "bg-transparent hover:bg-transparent text-white font-medium",
+        button:
+          "flex flex-col bg-transparent hover:bg-transparent text-white font-medium",
         allowedContent: "hidden",
       }}
       onClientUploadComplete={(res) => {
         updateAvatarAction(userId, res[0].url);
-        alert("Аватар обновлен!");
+        alert("Avatar updated!");
       }}
       endpoint="imageUploader"
     />

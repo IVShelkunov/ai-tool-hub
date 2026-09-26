@@ -1,4 +1,5 @@
 import { AvatarUploader } from "@/components/shared/AvatarUploader";
+import { ProfileEditForm } from "@/components/shared/ProfileEditForm";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -18,7 +19,7 @@ export default async function ProfilePage() {
   if (user)
     return (
       <div className="flex flex-col items-center justify-center gap-4 ">
-        <h2 className="text-2xl text-center">PROFILE</h2>
+        <h2 className="text-2xl text-center tracking-widest ">PROFILE</h2>
 
         <div className="relative group cursor-pointer">
           <Image
@@ -33,7 +34,7 @@ export default async function ProfilePage() {
             <AvatarUploader userId={user.id} />
           </div>
         </div>
-        <p>{user.name}</p>
+        {userId && <ProfileEditForm user={user} initialValue={user.name} />}
       </div>
     );
 }
