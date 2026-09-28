@@ -2,7 +2,7 @@ import { ToolCard } from "@/components/shared/ToolCard";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { db } from "@/db";
 import { aiTools, favorites } from "@/db/schema";
-import { getSession } from "@/lib/auth-utils";
+import { getSession } from "@/lib/utils/auth-utils";
 import { eq } from "drizzle-orm";
 
 export default async function Home() {

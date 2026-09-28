@@ -32,6 +32,13 @@ export function ProfileEditForm({
         >
           {isPending ? "..." : "SAVE"}
         </button>
+        <button
+          className="border border-white/60 px-4 py-2 rounded-lg hover:border-white/20"
+          type="button"
+          onClick={() => setIsEdit(false)}
+        >
+          CANCEL
+        </button>
       </form>
     );
   } else {

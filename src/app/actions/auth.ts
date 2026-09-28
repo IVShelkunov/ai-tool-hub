@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { sessions, users, verificationTokens } from "@/db/schema";
-import { hashPassword, verifyPassword } from "@/lib/auth-utils";
+import { hashPassword, verifyPassword } from "@/lib/utils/auth-utils";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
