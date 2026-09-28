@@ -5,6 +5,7 @@ import { OpenEye } from "../icon/OpenEye";
 import { CloseEye } from "../icon/CloseEye";
 import { cn } from "cn";
 import { FormState, registerAction } from "@/app/actions/auth";
+import { PasswordEye } from "../ui/PasswordEye";
 
 export function RegisterForm() {
   const [inputData, setInputData] = useState<{
@@ -81,14 +82,7 @@ export function RegisterForm() {
         )}
       </FormGroup>
       <FormGroup className="flex-row">
-        <label className={formStyle.label} htmlFor="show-pass">
-          {showPass ? "HIDE" : "SHOW"} PASSWORD
-          {showPass ? (
-            <OpenEye className="w-8 h-8" />
-          ) : (
-            <CloseEye className="w-8 h-8" />
-          )}
-        </label>
+        <PasswordEye className={formStyle.label} isShowPass={showPass} />
         <input
           id="show-pass"
           type="checkbox"

@@ -3,7 +3,7 @@ import { ProfileEditForm } from "@/components/shared/ProfileEditForm";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { getSession } from "@/lib/auth-utils";
+import { getSession } from "@/lib/utils/auth-utils";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
 

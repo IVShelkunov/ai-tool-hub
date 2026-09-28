@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DeleteToolsButton } from "@/components/ui/DeleteToolsButton";
 import { db } from "@/db";
 import { favorites } from "@/db/schema";
-import { getSession } from "@/lib/auth-utils";
+import { getSession } from "@/lib/utils/auth-utils";
 import { eq } from "drizzle-orm";
 
 export default async function DashboardPage() {

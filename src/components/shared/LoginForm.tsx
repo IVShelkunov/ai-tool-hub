@@ -6,6 +6,7 @@ import { loginAction } from "@/app/actions/auth";
 import { cn } from "cn";
 import { OpenEye } from "../icon/OpenEye";
 import { CloseEye } from "../icon/CloseEye";
+import { PasswordEye } from "../ui/PasswordEye";
 
 export function LoginForm() {
   const [inputData, setInputData] = useState<{
@@ -58,14 +59,7 @@ export function LoginForm() {
         />
       </FormGroup>
       <FormGroup className="flex-row">
-        <label className={formStyle.label} htmlFor="show-pass">
-          {showPass ? "HIDE" : "SHOW"} PASSWORD
-          {showPass ? (
-            <OpenEye className="w-8 h-8" />
-          ) : (
-            <CloseEye className="w-8 h-8" />
-          )}
-        </label>
+        <PasswordEye className={formStyle.label} isShowPass={showPass} />
         <input
           id="show-pass"
           type="checkbox"

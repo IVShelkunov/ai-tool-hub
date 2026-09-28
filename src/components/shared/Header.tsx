@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { LoginButton } from "../ui/LoginButton";
 import Link from "next/link";
 import { LogoutButton } from "../ui/LogoutButton";
+import { UILink } from "../ui/UILink";
 
 export async function Header() {
   const coockieStore = await cookies();
@@ -20,18 +21,8 @@ export async function Header() {
           </Link>
           {token && (
             <>
-              <Link
-                href={"/dashboard"}
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                DASHBOARD
-              </Link>
-              <Link
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                href={"/profile"}
-              >
-                PROFILE
-              </Link>
+              <UILink href="/dashboard" text="DASHBOARD" />
+              <UILink href="/profile" text="PROFILE" />
             </>
           )}
         </div>
