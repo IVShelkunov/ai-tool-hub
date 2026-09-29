@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { LoginButton } from "../ui/LoginButton";
 import Link from "next/link";
-import { LogoutButton } from "../ui/LogoutButton";
 import { UILink } from "../ui/UILink";
+import { UserWidget } from "./UserWidget";
 
 export async function Header() {
   const coockieStore = await cookies();
@@ -22,12 +22,11 @@ export async function Header() {
           {token && (
             <>
               <UILink href="/dashboard" text="DASHBOARD" />
-              <UILink href="/profile" text="PROFILE" />
             </>
           )}
         </div>
         <div className="flex items-center gap-4">
-          {token ? <LogoutButton /> : <LoginButton />}
+          {token ? <UserWidget /> : <LoginButton />}
         </div>
       </nav>
     </header>

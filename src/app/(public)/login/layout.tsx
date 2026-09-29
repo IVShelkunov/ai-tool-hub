@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { UILink } from "@/components/ui/UILink";
-import Link from "next/link";
 import { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
