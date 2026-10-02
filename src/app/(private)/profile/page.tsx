@@ -1,11 +1,11 @@
 import { AvatarUploader } from "@/components/shared/AvatarUploader";
 import { ProfileEditForm } from "@/components/shared/ProfileEditForm";
+import { AvatarIcon } from "@/components/ui/AvatarIcon";
 import { Card } from "@/components/ui/card";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { getSession } from "@/lib/utils/auth-utils";
 import { eq } from "drizzle-orm";
-import Image from "next/image";
 
 export default async function ProfilePage() {
   const userId = await getSession();
@@ -22,13 +22,9 @@ export default async function ProfilePage() {
         <h2 className="text-2xl text-center tracking-widest ">PROFILE</h2>
 
         <div className="relative group cursor-pointer">
-          <Image
+          <AvatarIcon
+            url={user.avatarUrl}
             className="w-32 h-32 rounded-full object-cover border-2 border-indigo-500"
-            width={128}
-            height={128}
-            alt="avatar"
-            src={user.avatarUrl || "/placeholder.png"}
-            priority
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <AvatarUploader userId={user.id} />
