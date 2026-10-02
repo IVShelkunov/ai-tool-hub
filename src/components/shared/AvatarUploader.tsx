@@ -1,8 +1,6 @@
 "use client";
 import { updateAvatarAction } from "@/app/actions/user";
-import { OurFileRouter } from "@/app/api/uploadthing/core";
 import { useUploadThing } from "@/lib/utils/uploadthing";
-import { UploadButton } from "@uploadthing/react";
 
 export function AvatarUploader({ userId }: { userId: string }) {
   const { startUpload } = useUploadThing("imageUploader", {
