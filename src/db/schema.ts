@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 //users
 export const users = pgTable('users', {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -40,8 +40,20 @@ export const favorites = pgTable('favorites', {
 }, (table) => ({
     uniqueIdx: uniqueIndex("unique_favorite").on(table.toolId, table.userId)
 }));
+//Messages
+export const messages = pgTable('messages', {
+    id: uuid("id").defaultRandom().primaryKey(),
+    senderId: uuid("sender_id").references(() => users.id).notNull(),
+    receiverId: uuid("receiver_id").references(() => users.id).notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+    senderIdx: index("sender_idx").on(table.senderId),
+    receiverIdx: index("receiver_idx").on(table.receiverId)
+}));
 
 
+//Relations
 export const userRelation = relations(users, ({ many }) => ({
     favorites: many(favorites)
 }));
@@ -51,5 +63,9 @@ export const favoritesRelation = relations(favorites, ({ one }) => ({
 }));
 export const sessionRelation = relations(sessions, ({ one }) => ({
     user: one(users, { fields: [sessions.userId], references: [users.id] })
+}));
+export const messageRelation = relations(messages, ({ one }) => ({
+    sender: one(users, { fields: [messages.senderId], references: [users.id], relationName: "sender" }),
+    receiver: one(users, { fields: [messages.receiverId], references: [users.id], relationName: "receiver" })
 }));
 
