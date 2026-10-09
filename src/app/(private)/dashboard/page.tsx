@@ -1,3 +1,4 @@
+import { ChatWindow } from "@/components/shared/ChatWindow";
 import { ToolCard } from "@/components/shared/ToolCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeleteToolsButton } from "@/components/ui/DeleteToolsButton";
