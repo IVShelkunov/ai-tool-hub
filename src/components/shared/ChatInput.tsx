@@ -9,7 +9,6 @@ export function ChatInput({ receiverId }: { receiverId: string }) {
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
     const messageContent = content;
     setContent("");
 

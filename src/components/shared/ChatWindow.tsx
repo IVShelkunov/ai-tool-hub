@@ -6,20 +6,32 @@ import { useEffect, useState } from "react";
 import { ChatInput } from "./ChatInput";
 
 type Message = typeof messages.$inferSelect;
-export function ChatWindow({ receiverId }: { receiverId: string }) {
-  const [msgs, setMsgs] = useState<Message[]>([]);
+export function ChatWindow({
+  receiverId,
+  initialMsg,
+}: {
+  receiverId: string;
+  initialMsg: (typeof messages.$inferSelect)[];
+}) {
+  const [msgs, setMsgs] = useState<Message[]>(initialMsg);
   useEffect(() => {
     const channel = pusherClient.subscribe(`chat-${receiverId}`);
-    channel.bind("new-message", (data: Message) => {
+    const handleMessage = (data: Message) => {
       setMsgs((prev) => [...prev, data]);
-    });
+    };
+    channel.bind("new-message", handleMessage);
+    return () => {
+      channel.unbind("new-message", handleMessage);
+      pusherClient.unsubscribe(`chat-${receiverId}`);
+    };
   }, [receiverId]);
   return (
     <div className="flex flex-col ">
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-4">
         {msgs.length === 0 && <div>Chat is empty.Be the first to write!</div>}
         {msgs.map((msg) => (
           <div
+            key={msg.id}
             className={cn(
               "flex",
               msg.receiverId === receiverId ? "justify-end" : "justify-start",
@@ -28,10 +40,7 @@ export function ChatWindow({ receiverId }: { receiverId: string }) {
             {msg.content}
           </div>
         ))}
-        <form>
-          <input type="text" />
-          <ChatInput receiverId={receiverId} />
-        </form>
+        <ChatInput receiverId={receiverId} />
       </div>
     </div>
   );
