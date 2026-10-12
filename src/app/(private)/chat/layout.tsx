@@ -14,7 +14,7 @@ export default async function ChatLayout({
   if (!userId) return null;
   const allUsers = await db.select().from(users);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-screen   ">
       <h2 className="text-center text-2xl tracking-widest">Chat</h2>
       <div className="grid grid-cols-4">
         <Card className="col-span-1 flex flex-col">

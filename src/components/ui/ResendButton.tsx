@@ -19,7 +19,7 @@ export function ResendButton({
       }
       className="text-sky-400 hover:underline"
     >
-      {isPending ? "Sending..." : "Выслать письмо повторно"}
+      {isPending ? "SENDING..." : "RESEND THE MAIL"}
     </button>
   );
 }

@@ -4,10 +4,11 @@ import { db } from "@/db";
 import { messages } from "@/db/schema";
 import { pusherServer } from "@/lib/pusher";
 import { getSession } from "@/lib/utils/auth-utils"
+import { getChatRoomId } from "@/lib/utils/chat";
 import { and, asc, eq, or } from "drizzle-orm";
 
-export async function sendMessageAction(receiverId: string, content: string) {
-    const senderId = await getSession();
+export async function sendMessageAction(senderId: string, receiverId: string, content: string) {
+    const roomId = getChatRoomId(senderId, receiverId);
     if (!senderId) throw new Error("Unauthorized");
     const createdAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const [msg] = await db.insert(messages).values({
@@ -16,7 +17,7 @@ export async function sendMessageAction(receiverId: string, content: string) {
         content,
         createdAt
     }).returning();
-    await pusherServer.trigger(`chat-${receiverId}`, 'new-message', msg);
+    await pusherServer.trigger(`chat-${roomId}`, 'new-message', msg);
     return { success: true, message: msg }
 }
 export async function getMessage(receiverId: string) {

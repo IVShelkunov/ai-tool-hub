@@ -1,20 +1,21 @@
 "use client";
 
 import { sendMessageAction } from "@/app/actions/chat";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
-export function ChatInput({ receiverId }: { receiverId: string }) {
+export function ChatInput({
+  onSend,
+  isPending,
+}: {
+  onSend: (content: string) => void;
+  isPending: boolean;
+}) {
   const [content, setContent] = useState("");
-  const [isPending, startTransition] = useTransition();
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    const messageContent = content;
+    onSend(content);
     setContent("");
-
-    startTransition(async () => {
-      await sendMessageAction(receiverId, messageContent);
-    });
   };
 
   return (
