@@ -26,7 +26,11 @@ export function ChatInput({
         className="flex-1 p-2 rounded-lg bg-slate-900 border border-white/10"
         placeholder="Type a message..."
       />
-      <button type="submit" disabled={isPending}>
+      <button
+        className="bg-indigo-500/70 rounded-lg px-4 hover:bg-indigo-500/90 transition-all duration-200"
+        type="submit"
+        disabled={isPending}
+      >
         SEND
       </button>
     </form>

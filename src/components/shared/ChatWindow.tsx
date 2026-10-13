@@ -2,7 +2,13 @@
 import { messages } from "@/db/schema";
 import { pusherClient } from "@/lib/pusher";
 import { cn } from "cn";
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import {
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { ChatInput } from "./ChatInput";
 import { sendMessageAction } from "@/app/actions/chat";
 import { getChatRoomId } from "@/lib/utils/chat";
@@ -17,12 +23,14 @@ export function ChatWindow({
   receiverId: string;
   initialMsg: (typeof messages.$inferSelect)[];
 }) {
+  const chatMsgRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const [msgs, setMsgs] = useState<Message[]>(initialMsg);
   const [optimisticMessages, addOptimisticMessage] = useOptimistic(
     msgs,
     (state: Message[], newMsg: Message) => [...state, newMsg],
   );
+
   useEffect(() => {
     const roomId = getChatRoomId(senderId, receiverId);
     const channel = pusherClient.subscribe(`chat-${roomId}`);
@@ -45,9 +53,17 @@ export function ChatWindow({
       await sendMessageAction(senderId, receiverId, content);
     });
   };
+  useEffect(() => {
+    if (chatMsgRef.current) {
+      chatMsgRef.current.scrollTop = chatMsgRef.current.scrollHeight;
+    }
+  }, [optimisticMessages]);
   return (
-    <div className="flex flex-col p-6">
-      <div className="flex flex-col gap-4 overflow-y-scroll">
+    <div className="flex flex-col h-[calc(100vh-8rem)] p-6">
+      <div
+        ref={chatMsgRef}
+        className="flex flex-1 flex-col gap-4 py-4 overflow-y-auto"
+      >
         {optimisticMessages.length === 0 && (
           <div>Chat is empty.Be the first to write!</div>
         )}
@@ -55,17 +71,17 @@ export function ChatWindow({
           <div
             key={msg.id}
             className={cn(
-              " rounded-2xl p-2 ",
+              "max-w-[70%] rounded-2xl p-2 ",
               msg.receiverId === senderId
-                ? " bg-slate-500/70"
-                : " bg-sky-600/70",
+                ? "self-start bg-slate-500/70"
+                : "self-end bg-sky-600/70",
             )}
           >
             {msg.content}
           </div>
         ))}
-        <ChatInput isPending={isPending} onSend={handleSend} />
       </div>
+      <ChatInput isPending={isPending} onSend={handleSend} />
     </div>
   );
 }

@@ -14,19 +14,21 @@ export default async function ChatLayout({
   if (!userId) return null;
   const allUsers = await db.select().from(users);
   return (
-    <div className="flex flex-col h-screen   ">
+    <div className="flex flex-col overflow-hidden   ">
       <h2 className="text-center text-2xl tracking-widest">Chat</h2>
-      <div className="grid grid-cols-4">
-        <Card className="col-span-1 flex flex-col">
+      <div className="flex-1 grid  grid-cols-4 gap-4">
+        <div className="md:col-span-1 col-span-4 flex flex-col">
           {allUsers
             .filter((u) => u.id !== userId)
             .map((user) => (
               <Link key={user.id} href={`/chat/${user.id}`}>
-                {user.email}
+                <Card>{user.email} </Card>
               </Link>
             ))}
-        </Card>
-        <div className="col-span-3 col-start-2">{children}</div>
+        </div>
+        <div className="md:col-span-3 md:col-start-2 col-span-4 col-start-1">
+          {children}
+        </div>
       </div>
     </div>
   );
