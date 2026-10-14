@@ -12,8 +12,12 @@ import {
 import { ChatInput } from "./ChatInput";
 import { sendMessageAction } from "@/app/actions/chat";
 import { getChatRoomId } from "@/lib/utils/chat";
-
-type Message = typeof messages.$inferSelect;
+import { MessageCard } from "./MessageCard";
+type StatusMessage = "pending" | "sent" | "error";
+type DBMessage = typeof messages.$inferSelect;
+export type UIMessage = DBMessage & {
+  status: StatusMessage;
+};
 export function ChatWindow({
   senderId,
   receiverId,
@@ -21,21 +25,24 @@ export function ChatWindow({
 }: {
   senderId: string;
   receiverId: string;
-  initialMsg: (typeof messages.$inferSelect)[];
+  initialMsg: DBMessage[];
 }) {
   const chatMsgRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
-  const [msgs, setMsgs] = useState<Message[]>(initialMsg);
+  const [msgs, setMsgs] = useState<UIMessage[]>(() =>
+    initialMsg.map((m) => ({ ...m, status: "sent" })),
+  );
   const [optimisticMessages, addOptimisticMessage] = useOptimistic(
     msgs,
-    (state: Message[], newMsg: Message) => [...state, newMsg],
+    (state: UIMessage[], newMsg: UIMessage) => [...state, newMsg],
   );
 
   useEffect(() => {
     const roomId = getChatRoomId(senderId, receiverId);
     const channel = pusherClient.subscribe(`chat-${roomId}`);
-    const handleMessage = (data: Message) => {
-      setMsgs((prev) => [...prev, data]);
+    const handleMessage = (data: DBMessage) => {
+      if (data.senderId === senderId) return;
+      setMsgs((prev) => [...prev, { ...data, status: "sent" }]);
     };
     channel.bind("new-message", handleMessage);
     return () => {
@@ -45,12 +52,22 @@ export function ChatWindow({
   }, [receiverId]);
   const handleSend = (content: string) => {
     startTransition(async () => {
-      addOptimisticMessage({
-        id: crypto.randomUUID(),
+      const tempId = crypto.randomUUID();
+      const tempMsg: UIMessage = {
+        id: tempId,
         content,
-        senderId: senderId,
-      } as Message);
-      await sendMessageAction(senderId, receiverId, content);
+        senderId,
+        receiverId,
+        createdAt: new Date(),
+        status: "pending",
+      };
+      addOptimisticMessage(tempMsg);
+      try {
+        const result = await sendMessageAction(senderId, receiverId, content);
+        setMsgs((prev) => [...prev, { ...result.message, status: "sent" }]);
+      } catch (err) {
+        console.error("Ошибка отправки");
+      }
     });
   };
   useEffect(() => {
@@ -68,17 +85,7 @@ export function ChatWindow({
           <div>Chat is empty.Be the first to write!</div>
         )}
         {optimisticMessages.map((msg) => (
-          <div
-            key={msg.id}
-            className={cn(
-              "max-w-[70%] rounded-2xl p-2 ",
-              msg.receiverId === senderId
-                ? "self-start bg-slate-500/70"
-                : "self-end bg-sky-600/70",
-            )}
-          >
-            {msg.content}
-          </div>
+          <MessageCard key={msg.id} senderId={senderId} message={msg} />
         ))}
       </div>
       <ChatInput isPending={isPending} onSend={handleSend} />
