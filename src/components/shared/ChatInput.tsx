@@ -1,20 +1,21 @@
 "use client";
 
 import { sendMessageAction } from "@/app/actions/chat";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
-export function ChatInput({ receiverId }: { receiverId: string }) {
+export function ChatInput({
+  onSend,
+  isPending,
+}: {
+  onSend: (content: string) => void;
+  isPending: boolean;
+}) {
   const [content, setContent] = useState("");
-  const [isPending, startTransition] = useTransition();
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    const messageContent = content;
+    onSend(content);
     setContent("");
-
-    startTransition(async () => {
-      await sendMessageAction(receiverId, messageContent);
-    });
   };
 
   return (
@@ -25,7 +26,11 @@ export function ChatInput({ receiverId }: { receiverId: string }) {
         className="flex-1 p-2 rounded-lg bg-slate-900 border border-white/10"
         placeholder="Type a message..."
       />
-      <button type="submit" disabled={isPending}>
+      <button
+        className="bg-indigo-500/70 rounded-lg px-4 hover:bg-indigo-500/90 transition-all duration-200"
+        type="submit"
+        disabled={isPending}
+      >
         SEND
       </button>
     </form>

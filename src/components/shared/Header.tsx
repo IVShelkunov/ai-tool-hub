@@ -14,7 +14,7 @@ export async function Header() {
   const userId = await getSession();
 
   return (
-    <header className=" p-2 sticky top-0 z-50 w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
+    <header className=" p-2 fixed top-0 z-50 w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
       <nav
         className="container mx-auto flex h-16 items-center justify-between px-4 md:px-10"
         aria-label="Global"

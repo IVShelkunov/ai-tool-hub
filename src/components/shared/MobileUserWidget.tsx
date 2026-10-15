@@ -22,7 +22,7 @@ export function MobileUserWidget({
       {isShowMenu && (
         <Card
           onClick={(e) => e.stopPropagation()}
-          className="bg-indigo-900/70  absolute inset-0 h-screen flex flex-col justify-center text-2xl items-center gap-4"
+          className="bg-slate-900/70  absolute inset-0 h-screen flex flex-col justify-center text-2xl items-center gap-4"
         >
           <button onClick={() => setIsShow(false)}>
             <CancelCross className="w-10 h-10 absolute top-4 left-4" />
@@ -32,6 +32,7 @@ export function MobileUserWidget({
             href="/profile"
             text="PROFILE"
           />
+          <UILink onClick={() => setIsShow(false)} href="/chat" text="CHAT" />
           <LogoutButton />
         </Card>
       )}

@@ -2,22 +2,48 @@
 import { messages } from "@/db/schema";
 import { pusherClient } from "@/lib/pusher";
 import { cn } from "cn";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { ChatInput } from "./ChatInput";
-
-type Message = typeof messages.$inferSelect;
+import { sendMessageAction } from "@/app/actions/chat";
+import { getChatRoomId } from "@/lib/utils/chat";
+import { MessageCard } from "./MessageCard";
+import Link from "next/link";
+type StatusMessage = "pending" | "sent" | "error";
+type DBMessage = typeof messages.$inferSelect;
+export type UIMessage = DBMessage & {
+  status: StatusMessage;
+};
 export function ChatWindow({
+  senderId,
   receiverId,
   initialMsg,
 }: {
+  senderId: string;
   receiverId: string;
-  initialMsg: (typeof messages.$inferSelect)[];
+  initialMsg: DBMessage[];
 }) {
-  const [msgs, setMsgs] = useState<Message[]>(initialMsg);
+  const chatMsgRef = useRef<HTMLDivElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [msgs, setMsgs] = useState<UIMessage[]>(() =>
+    initialMsg.map((m) => ({ ...m, status: "sent" })),
+  );
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    msgs,
+    (state: UIMessage[], newMsg: UIMessage) => [...state, newMsg],
+  );
+
   useEffect(() => {
-    const channel = pusherClient.subscribe(`chat-${receiverId}`);
-    const handleMessage = (data: Message) => {
-      setMsgs((prev) => [...prev, data]);
+    const roomId = getChatRoomId(senderId, receiverId);
+    const channel = pusherClient.subscribe(`chat-${roomId}`);
+    const handleMessage = (data: DBMessage) => {
+      if (data.senderId === senderId) return;
+      setMsgs((prev) => [...prev, { ...data, status: "sent" }]);
     };
     channel.bind("new-message", handleMessage);
     return () => {
@@ -25,23 +51,53 @@ export function ChatWindow({
       pusherClient.unsubscribe(`chat-${receiverId}`);
     };
   }, [receiverId]);
+  const handleSend = (content: string) => {
+    startTransition(async () => {
+      const tempId = crypto.randomUUID();
+      const tempMsg: UIMessage = {
+        id: tempId,
+        content,
+        senderId,
+        receiverId,
+        createdAt: new Date(),
+        status: "pending",
+      };
+      addOptimisticMessage(tempMsg);
+      try {
+        const result = await sendMessageAction(senderId, receiverId, content);
+        setMsgs((prev) => [...prev, { ...result.message, status: "sent" }]);
+      } catch (err) {
+        console.error("Ошибка отправки");
+      }
+    });
+  };
+  useEffect(() => {
+    if (chatMsgRef.current) {
+      chatMsgRef.current.scrollTop = chatMsgRef.current.scrollHeight;
+    }
+  }, [optimisticMessages]);
   return (
-    <div className="flex flex-col ">
-      <div className="flex flex-col gap-4">
-        {msgs.length === 0 && <div>Chat is empty.Be the first to write!</div>}
-        {msgs.map((msg) => (
-          <div
-            key={msg.id}
-            className={cn(
-              "flex",
-              msg.receiverId === receiverId ? "justify-end" : "justify-start",
-            )}
-          >
-            {msg.content}
-          </div>
-        ))}
-        <ChatInput receiverId={receiverId} />
+    <div className="flex flex-col h-[calc(100vh-8rem)] p-6">
+      <div className="flex items-center gap-2 mb-2 md:hidden">
+        <Link
+          href="/chat"
+          className="text-sky-400  hover:text-sky-300 text-base flex items-center gap-1 font-semibold"
+        >
+          ← BACK TO THE LIST
+        </Link>
       </div>
+      <div
+        ref={chatMsgRef}
+        className="flex flex-1 flex-col gap-4 py-4 overflow-y-auto"
+      >
+        {optimisticMessages.length === 0 && (
+          <div>Chat is empty.Be the first to write!</div>
+        )}
+        {optimisticMessages.map((msg) => (
+          <MessageCard key={msg.id} senderId={senderId} message={msg} />
+        ))}
+      </div>
+      <ChatInput isPending={isPending} onSend={handleSend} />
     </div>
   );
 }
