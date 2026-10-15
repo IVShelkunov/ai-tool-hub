@@ -13,6 +13,7 @@ import { ChatInput } from "./ChatInput";
 import { sendMessageAction } from "@/app/actions/chat";
 import { getChatRoomId } from "@/lib/utils/chat";
 import { MessageCard } from "./MessageCard";
+import Link from "next/link";
 type StatusMessage = "pending" | "sent" | "error";
 type DBMessage = typeof messages.$inferSelect;
 export type UIMessage = DBMessage & {
@@ -77,6 +78,14 @@ export function ChatWindow({
   }, [optimisticMessages]);
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] p-6">
+      <div className="flex items-center gap-2 mb-2 md:hidden">
+        <Link
+          href="/chat"
+          className="text-sky-400  hover:text-sky-300 text-base flex items-center gap-1 font-semibold"
+        >
+          ← BACK TO THE LIST
+        </Link>
+      </div>
       <div
         ref={chatMsgRef}
         className="flex flex-1 flex-col gap-4 py-4 overflow-y-auto"
